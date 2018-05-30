@@ -10,22 +10,22 @@
     "dev": "nodemon src/app.js",
     "test": "nyc ava",
     "lint": "eslint src test || exit 0",
-    "cover": "nyc report --reporter=text-lcov | coveralls"
+    "cover": "nyc report --reporter=text-lcov | coveralls",
+    "pending-local": "knex-migrate pending --env local",
+    "migrate-local": "knex-migrate up --env local",
+    "rollback-local": "knex-migrate rollback --env local"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/4alltecnologia/node-es6-seed"
+    "url": "https://github.com/arielril/node-seed-di.git"
   },
   "keywords": [
-    "seed",
-    "project",
-    "4all",
     "node",
     "pm2",
     "i18n",
     "knex"
   ],
-  "author": "4All Tecnologia EPP",
+  "author": "Ariel Ril",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -40,19 +40,20 @@
     "i18n": "^0.8.3",
     "joi": "^13.1.0",
     "knex": "^0.14.2",
+    "knex-migrate": "^1.5.5",
     "lodash": "^4.17.4",
     "moment-timezone": "^0.5.14",
     "mysql2": "^1.5.1",
     "request": "^2.83.0",
     "request-debug": "^0.2.0",
+    "supertest": "^3.1.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {
-    "ava": "^0.22.0",
-    "coveralls": "^3.0.0",
     "eslint": "^4.14.0",
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-plugin-import": "^2.8.0",
-    "nyc": "^11.2.1"
+    "eslint-plugin-jest": "^21.17.0",
+    "jest": "^23.1.0"
   }
 }
