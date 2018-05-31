@@ -1,3 +1,5 @@
+const moment = require('moment-timezone');
+
 let userList = [
   {
     id: '1',
@@ -51,7 +53,14 @@ const insert = jest.fn()
   .mockImplementation(async (info) => {
     const nextId = userList.length;
 
-    userList.push(info);
+    const newUser = {
+      ...info,
+      id: String(nextId),
+      createdAt: moment().format('YYYY-MM-DD HH:MM:ss'),
+      updatedAt: moment().format('YYYY-MM-DD HH:MM:ss'),
+    };
+
+    userList.push(newUser);
 
     return String(nextId);
   });
