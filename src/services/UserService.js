@@ -31,7 +31,7 @@ const makeUserService = ({ model }) => ({
 
       return {
         data: {
-          user,
+          user: Array.isArray(user) ? {} : user,
         },
       };
     } catch (e) {
