@@ -5,10 +5,9 @@ const userType = require('../types/user');
 const TABLE_NAME = 'user';
 
 const makeUserModel = db => ({
-  list: () => db.from(TABLE_NAME)
-    .whereNot('status', userType.DELETED),
+  list: () => db.from(TABLE_NAME),
 
-  get: id => db.from(TABLE_NAME)
+  get: ({ id }) => db.from(TABLE_NAME)
     .where('id', id)
     .whereNot('status', userType.DELETED),
 
@@ -34,11 +33,11 @@ const makeUserModel = db => ({
       .whereNot('status', userType.DELETED);
   },
 
-  delete: id => db.from(TABLE_NAME)
+  remove: ({ id }) => db.from(TABLE_NAME)
     .where({ id })
     .update({
       status: userType.DELETED,
-      deletedAt: moment().toNow(),
+      deletedAt: moment().format('YYYY-MM-DD HH:MM:ss'),
     }),
 });
 

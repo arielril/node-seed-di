@@ -2,7 +2,7 @@
 const settings = {};
 
 const load = async ({ db }) => {
-  const listSettings = db.select([
+  const listSettings = await db.select([
     'name',
     'type',
     'value',
@@ -10,7 +10,12 @@ const load = async ({ db }) => {
     .from('settings');
 
   if (listSettings) {
-    listSettings.forEach(({ type, value, name }) => {
+    for (const setting of listSettings) {
+      const {
+        value,
+        name,
+        type,
+      } = setting;
       switch (type) {
         case 'NUMBER': settings[name] = parseInt(value, 10);
           break;
@@ -25,7 +30,7 @@ const load = async ({ db }) => {
         default: settings[name] = undefined;
           break;
       }
-    });
+    }
   }
 };
 

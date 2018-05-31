@@ -8,10 +8,11 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 
+const { knex } = require('./config/db');
+const { makeUserModel } = require('./models/userModel');
+const { makeUserService } = require('./services/userService');
+const { makeUserController } = require('./controllers/userController');
 const { makeUserRoutes } = require('./routes/user');
-
-/* Routes */
-const userRoutes = makeUserRoutes();
 
 /* Express initialization */
 const app = express();
@@ -19,6 +20,20 @@ const app = express();
 /* Logger */
 const LoggerConfig = require('./config/LoggerConfig');
 const Logger = require('./helpers/Logger');
+
+/* Controllers */
+const userController = makeUserController({
+  Logger,
+  service: makeUserService({
+    model: makeUserModel(knex),
+  }),
+});
+
+/* Routes */
+const userRoutes = makeUserRoutes({
+  controller: userController,
+});
+
 
 /* Express utilites */
 app.use(helmet());

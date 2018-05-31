@@ -2,7 +2,6 @@ const winston = require('winston');
 
 /* Logger use RFC5424 */
 class Logger {
-
   static emerg(...emerg) {
     winston.log('emerg', ...emerg);
   }
@@ -36,8 +35,21 @@ class Logger {
   }
 
   static throw(res, code, ...args) {
+    const [error] = args && args.length > 0 ? args : [null];
+
+    if (error && error.code) {
+      code += `.${error.code}`; // eslint-disable-line
+    }
+
+    const message = error && error.message ? error.message : res.__('helpers.logger.throw');
+
     this.error(...args);
-    res.status(500).send({ success: false, code, message: res.__('helpers.logger.throw') });
+    res.status(500)
+      .send({
+        success: false,
+        code,
+        message,
+      });
   }
 }
 

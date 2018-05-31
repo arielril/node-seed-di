@@ -1,5 +1,3 @@
-const { toUnixEpoch } = require('../helpers/Datetime');
-
 const makeUserService = ({ model }) => ({
   list: async () => {
     try {
@@ -8,12 +6,7 @@ const makeUserService = ({ model }) => ({
           throw new Error('Não foi possível listar usuários');
         });
 
-      const result = users.map(item => ({
-        ...item,
-        createdAt: toUnixEpoch(item.createdAt),
-        updatedAt: toUnixEpoch(item.updatedAt),
-        deletedAt: toUnixEpoch(item.deletedAt),
-      }));
+      const result = users.map(item => item);
 
       return {
         data: {
@@ -28,10 +21,10 @@ const makeUserService = ({ model }) => ({
   get: async (data) => {
     try {
       const {
-        id,
+        userId: id,
       } = data;
 
-      const user = await model.get(id)
+      const user = await model.get({ id })
         .catch(() => {
           throw new Error('Falha ao adiquirir usuario');
         });
@@ -66,7 +59,7 @@ const makeUserService = ({ model }) => ({
   update: async (data) => {
     try {
       const {
-        id,
+        userId: id,
         name,
       } = data;
 
@@ -102,7 +95,7 @@ const makeUserService = ({ model }) => ({
   delete: async (info) => {
     try {
       const {
-        id,
+        userId: id,
       } = info;
 
       const user = await model.get({ id })
@@ -114,7 +107,7 @@ const makeUserService = ({ model }) => ({
         throw new Error('Usuário inexistente');
       }
 
-      await model.delete({ id })
+      await model.remove({ id })
         .catch(() => {
           throw new Error('Falha ao deletar usuário');
         });

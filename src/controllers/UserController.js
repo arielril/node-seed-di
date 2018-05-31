@@ -1,5 +1,3 @@
-const Logger = require('../helpers/Logger');
-
 function sendResponse(res, data) {
   res.status(data ? 200 : 204)
     .send({
@@ -8,7 +6,7 @@ function sendResponse(res, data) {
     });
 }
 
-const makeUserController = ({ service }) => ({
+const makeUserController = ({ Logger, service }) => ({
   list: async (req, res) => {
     try {
       const { data } = await service.list();
@@ -55,9 +53,9 @@ const makeUserController = ({ service }) => ({
         ...req.body,
       };
 
-      const { data } = await service.update(updateData);
+      await service.update(updateData);
 
-      sendResponse(res, data);
+      sendResponse(res);
     } catch (e) {
       Logger.throw(res, '2351002392', e);
     }

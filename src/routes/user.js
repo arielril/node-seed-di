@@ -1,16 +1,7 @@
 const express = require('express');
 const schema = require('./schemas/UserSchema');
 
-const { knex } = require('../config/db');
-const { makeUserModel } = require('../models/userModel');
-const { makeUserService } = require('../services/userService');
-const { makeUserController } = require('../controllers/userController');
-
-const model = makeUserModel(knex);
-const service = makeUserService({ model });
-const controller = makeUserController({ service });
-
-const makeUserRoutes = () => {
+const makeUserRoutes = ({ controller }) => {
   const router = express.Router();
 
   router.route('/')
