@@ -1,22 +1,28 @@
 const express = require('express');
-const UserController = require('../controllers/UserController');
-const UserSchema = require('../routes/schemas/UserSchema');
+const schema = require('./schemas/UserSchema');
 
-const router = express.Router({ mergeParams: true });
+const { knex } = require('../config/db');
+const { makeUserModel } = require('../models/userModel');
+const { makeUserService } = require('../services/userService');
+const { makeUserController } = require('../controllers/userController');
 
-/* GET /user */
-router.get('/', UserSchema.list, UserController.list);
+const model = makeUserModel(knex);
+const service = makeUserService({ model });
+const controller = makeUserController({ service });
 
-/* GET /user/:userId */
-router.get('/:userId', UserSchema.get, UserController.get);
+const makeUserRoutes = () => {
+  const router = express.Router();
 
-/* POST /user */
-router.post('/', UserSchema.post, UserController.post);
+  router.route('/')
+    .get(schema.list, controller.list)
+    .post(schema.insert, controller.insert);
 
-/* PUT /user/:userId */
-router.put('/:userId', UserSchema.put, UserController.put);
+  router.route('/:userId')
+    .get(schema.get, controller.get)
+    .put(schema.update, controller.update)
+    .delete(schema.delete, controller.delete);
 
-/* DELETE /user/:userId */
-router.delete('/:userId', UserSchema.delete, UserController.delete);
+  return router;
+};
 
-module.exports = router;
+module.exports = { makeUserRoutes };

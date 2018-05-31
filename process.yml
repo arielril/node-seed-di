@@ -1,8 +1,8 @@
 apps:
-  - script   : 'src/app.js'
+  - script   : 'src/server.js'
     name     : 'service'
     exec_mode: 'cluster'
-    instances: -1
+    instances: 1
   - script   : 'src/worker.js'
     name     : 'worker'
     exec_mode: 'cluster'

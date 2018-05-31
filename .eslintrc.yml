@@ -1,8 +1,13 @@
-extends: airbnb-base
+extends:
+  - airbnb-base
 plugins:
   - import
+  - jest
 rules:
   arrow-body-style: 0
   no-underscore-dangle: 0
 globals:
   __: true
+env:
+  jest:
+    globals: true

@@ -2,13 +2,14 @@
 require('dotenv').config();
 const debug = require('debug')('worker');
 
-/* Dependencies */
-require('./config/i18n');
-const Cron = require('./helpers/Cron');
+/* Settings */
+const Settings = require('./config/Settings');
 
 /* Logger */
 const LoggerConfig = require('./config/LoggerConfig');
-const Logger = require('./helpers/Logger');
+
+/* Dependencies */
+const Cron = require('./helpers/Cron');
 
 /* Crons */
 const EverySecond = require('./crons/EverySecond.js');

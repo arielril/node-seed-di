@@ -1,97 +1,82 @@
 const Logger = require('../helpers/Logger');
-const UserService = require('../services/UserService');
 
-class UserController {
-
-  static async list(req, res) {
-    try {
-      const rows = await UserService.list();
-
-      res.send({ success: true, data: rows });
-    } catch (err) {
-      Logger.throw(res, '3272358416', err);
-    }
-  }
-
-  static async get(req, res) {
-    try {
-      const user = await UserService.get(req.params);
-
-      if (user === null) {
-        res.send({
-          success: false,
-          code: '7731668134',
-          message: req.__('api.user.notFound'),
-        });
-        return;
-      }
-
-      res.send({ success: true, data: user });
-    } catch (err) {
-      Logger.throw(res, '6001059324', err);
-    }
-  }
-
-  static async post(req, res) {
-    const data = {
-      name: req.body.name.trim(),
-    };
-
-    try {
-      const [id] = await UserService.post(data);
-      res.send({ success: true, data: { id } });
-
-    } catch (err) {
-      Logger.throw(res, '2365958507', err);
-    }
-  }
-
-  static async put(req, res) {
-    const data = {
-      userId: req.params.userId,
-      name: req.body.name.trim(),
-    };
-
-    try {
-      const success = await UserService.put(data);
-
-      if (success === false) {
-        res.send({
-          success: false,
-          code: '7502749763',
-          message: req.__('api.user.notFound'),
-        });
-        return;
-      }
-
-      res.send({ success: true });
-    } catch (err) {
-      Logger.throw(res, '5768905470', err);
-    }
-  }
-
-  static async delete(req, res) {
-    const data = {
-      userId: req.params,
-    };
-
-    try {
-      const success = await UserService.delete(data);
-
-      if (success === false) {
-        res.send({
-          success: false,
-          code: '9517673561',
-          message: req.__('api.user.notFound'),
-        });
-        return;
-      }
-
-      res.send({ success: true });
-    } catch (err) {
-      Logger.throw(res, '5768005470', err);
-    }
-  }
+function sendResponse(res, data) {
+  res.status(data ? 200 : 204)
+    .send({
+      success: true,
+      data,
+    });
 }
 
-module.exports = UserController;
+const makeUserController = ({ service }) => ({
+  list: async (req, res) => {
+    try {
+      const { data } = await service.list();
+
+      sendResponse(res, data);
+    } catch (e) {
+      Logger.throw(res, '2015167517', e);
+    }
+  },
+
+  get: async (req, res) => {
+    try {
+      const find = {
+        ...req.params,
+        ...req.body,
+      };
+
+      const { data } = await service.get(find);
+
+      sendResponse(res, data);
+    } catch (e) {
+      Logger.throw(res, '4076319627', e);
+    }
+  },
+
+  insert: async (req, res) => {
+    try {
+      const insertData = {
+        ...req.body,
+      };
+
+      const { data } = await service.insert(insertData);
+
+      sendResponse(res, data);
+    } catch (e) {
+      Logger.throw(res, '2082461482', e);
+    }
+  },
+
+  update: async (req, res) => {
+    try {
+      const updateData = {
+        ...req.params,
+        ...req.body,
+      };
+
+      const { data } = await service.update(updateData);
+
+      sendResponse(res, data);
+    } catch (e) {
+      Logger.throw(res, '2351002392', e);
+    }
+  },
+
+  delete: async (req, res) => {
+    try {
+      const deleteData = {
+        ...req.params,
+        ...req.query,
+      };
+
+      await service.delete(deleteData);
+
+      sendResponse(res);
+    } catch (e) {
+      throw e;
+    }
+  },
+});
+
+module.exports = { makeUserController };

@@ -1,53 +1,45 @@
-const { knex } = require('../config/db');
+const moment = require('moment-timezone');
+
 const userType = require('../types/user');
 
-class UserModel {
+const TABLE_NAME = 'user';
 
-  static list() {
-    return knex
-    .from('user')
-    .whereNot('user.status', userType.DELETED);
-  }
+const makeUserModel = db => ({
+  list: () => db.from(TABLE_NAME)
+    .whereNot('status', userType.DELETED),
 
-  static get(userId) {
-    return knex
-    .first('id, name, status')
-    .from('user')
-    .where('user.id', userId)
-    .whereNot('user.status', userType.DELETED);
-  }
+  get: id => db.from(TABLE_NAME)
+    .where('id', id)
+    .whereNot('status', userType.DELETED),
 
-  static post(data) {
-    return knex
-    .from('user')
-    .insert(data);
-  }
+  insert: (info) => {
+    const insertData = JSON.parse(JSON.stringify(info));
 
-  static put(userId, data) {
-    const query = knex
-    .from('user');
+    return db.from(TABLE_NAME)
+      .insert(insertData)
+      .returning('id');
+  },
 
-    if (data.name) {
-      query.update('name', data.name);
-    }
+  update: (params) => {
+    const {
+      where,
+      data,
+    } = params;
 
-    query.where('user.id', userId)
-    .whereNot('user.status', userType.DELETED);
+    const updateData = JSON.parse(JSON.stringify(data));
 
-    return query;
-  }
+    return db.from(TABLE_NAME)
+      .update(updateData)
+      .where(where)
+      .whereNot('status', userType.DELETED);
+  },
 
-  static delete(userId) {
-    return knex
-    .from('user')
-    .where('user.id', userId)
-    .whereNot('user.status', userType.DELETED)
+  delete: id => db.from(TABLE_NAME)
+    .where({ id })
     .update({
       status: userType.DELETED,
-      deletedAt: knex.raw('NOW()'),
-    });
-  }
+      deletedAt: moment().toNow(),
+    }),
+});
 
-}
-
-module.exports = UserModel;
+module.exports = { makeUserModel };

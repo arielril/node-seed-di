@@ -1,10 +1,7 @@
 const Logger = require('../helpers/Logger');
 
-class EverySecond {
+const runner = () => Logger.info('Every second started...');
 
-  static runner() {
-    Logger.info(__('cron.everySecond.tick'));
-  }
-}
-
-module.exports = EverySecond;
+module.exports = {
+  runner,
+};

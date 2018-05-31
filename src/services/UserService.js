@@ -1,76 +1,130 @@
-const { knex } = require('../config/db');
-const UserModel = require('../models/UserModel');
 const { toUnixEpoch } = require('../helpers/Datetime');
 
-class UserService {
+const makeUserService = ({ model }) => ({
+  list: async () => {
+    try {
+      const users = await model.list()
+        .catch(() => {
+          throw new Error('Não foi possível listar usuários');
+        });
 
-  static async list() {
-    const list = await UserModel.list();
+      const result = users.map(item => ({
+        ...item,
+        createdAt: toUnixEpoch(item.createdAt),
+        updatedAt: toUnixEpoch(item.updatedAt),
+        deletedAt: toUnixEpoch(item.deletedAt),
+      }));
 
-    const result = list.map(user => ({
-      id: user.id,
-      name: user.name,
-      status: user.status,
-      createdAt: toUnixEpoch(user.createdAt),
-      updatedAt: toUnixEpoch(user.updatedAt),
-      deletedAt: user.deletedAt ? toUnixEpoch(user.deletedAt) : null,
-    }));
-
-    return list;
-  }
-
-  static async get(data) {
-    let user = await UserModel.get(data);
-
-    if (user) {
-      user = {
-        id: user.id,
-        name: user.name,
-        status: user.status,
-        createdAt: toUnixEpoch(user.createdAt),
-        updatedAt: toUnixEpoch(user.updatedAt),
-        deletedAt: user.deletedAt ? toUnixEpoch(user.deletedAt) : null,
+      return {
+        data: {
+          users: result,
+        },
       };
+    } catch (e) {
+      throw e;
     }
+  },
 
-    return user;
-  }
+  get: async (data) => {
+    try {
+      const {
+        id,
+      } = data;
 
-  static post(data) {
-    return UserModel.post(data);
-  }
+      const user = await model.get(id)
+        .catch(() => {
+          throw new Error('Falha ao adiquirir usuario');
+        });
 
-  static put(userId, data) {
-    return knex.transaction(async (trx) => {
-      const user = await UserModel.get(userId)
-        .transacting(trx);
+      return {
+        data: {
+          user,
+        },
+      };
+    } catch (e) {
+      throw e;
+    }
+  },
 
-      if (user) {
-        await UserModel.put(user.id, data)
-          .transacting(trx);
+  insert: async (info) => {
+    try {
+      const id = await model.insert(info)
+        .catch(() => {
+          throw new Error('Não foi possível adicionar usuário');
+        });
 
-        return true;
+      return {
+        data: {
+          insertedId: id,
+        },
+      };
+    } catch (e) {
+      throw e;
+    }
+  },
+
+  update: async (data) => {
+    try {
+      const {
+        id,
+        name,
+      } = data;
+
+      const user = await model.get({ id })
+        .catch(() => {
+          throw new Error('Usuário inexistente');
+        });
+
+      if (!user) {
+        throw new Error('Usuário inexistente');
       }
 
-      return false;
-    });
-  }
+      const updateData = {
+        where: {
+          id,
+        },
+        data: {
+          name,
+        },
+      };
 
-  static delete(data) {
-    return knex.transaction(async (trx) => {
-      const user = await UserModel.get(userId)
-        .transacting(trx);
+      await model.update(updateData)
+        .catch(() => {
+          throw new Error('Falha ao atualizar usuário');
+        });
 
-      if (user) {
-        await UserModel.delete(user.id, data)
-          .transacting(trx);
+      return;
+    } catch (e) {
+      throw e;
+    }
+  },
 
-        return true;
+  delete: async (info) => {
+    try {
+      const {
+        id,
+      } = info;
+
+      const user = await model.get({ id })
+        .catch(() => {
+          throw new Error('Usuário inexistente');
+        });
+
+      if (!user) {
+        throw new Error('Usuário inexistente');
       }
 
-      return false;
-    });
-  }
-}
+      await model.delete({ id })
+        .catch(() => {
+          throw new Error('Falha ao deletar usuário');
+        });
 
-module.exports = UserService;
+      return;
+    } catch (e) {
+      throw e;
+    }
+  },
+});
+
+module.exports = { makeUserService };
+
