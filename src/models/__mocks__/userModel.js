@@ -43,15 +43,24 @@ let userList = [
   },
 ];
 
-const list = jest.fn().mockImplementation(async () => userList);
+const list = jest.fn()
+  .mockImplementation(async () => userList)
+  .mockReturnValueOnce(Promise.reject());
 
 const get = jest.fn()
-  .mockImplementation(async ({ id }) =>
-    (userList.length - 1 < id ? [] : userList[id]));
+  .mockImplementation(async ({ id }) => {
+    id = parseInt(id, 10);
+    if (userList.length < id) {
+      return [];
+    }
+
+    return userList.find(user => user.id === String(id)) || {};
+  })
+  .mockReturnValueOnce(Promise.reject());
 
 const insert = jest.fn()
   .mockImplementation(async (info) => {
-    const nextId = userList.length;
+    const nextId = userList.length + 1;
 
     const newUser = {
       ...info,
@@ -63,17 +72,23 @@ const insert = jest.fn()
     userList.push(newUser);
 
     return String(nextId);
-  });
+  })
+  .mockReturnValueOnce(Promise.reject());
 
 const update = jest.fn().mockImplementation(async (params) => {
   const {
-    where: {
-      id,
-    },
     data,
   } = params;
 
-  if (id > userList.length - 1) {
+  let {
+    where: {
+      id,
+    },
+  } = params;
+
+  id = parseInt(id, 10);
+
+  if (id > userList.length) {
     return;
   }
 
@@ -83,17 +98,21 @@ const update = jest.fn().mockImplementation(async (params) => {
     ...old,
     ...data,
   };
-});
+})
+  .mockReturnValueOnce(Promise.reject());
 
 const remove = jest.fn().mockImplementation(async ({ id }) => {
+  id = parseInt(id, 10);
+
   if (id > userList.length) {
     return;
   }
 
   userList[id - 1] = undefined;
 
-  userList = JSON.parse(JSON.stringify(userList));
-});
+  userList = userList.filter(user => user);
+})
+  .mockReturnValueOnce(Promise.reject());
 
 const makeUserModel = () => ({
   list,
@@ -101,6 +120,7 @@ const makeUserModel = () => ({
   insert,
   update,
   remove,
+  // catch: jest.fn().mockImplementation(val => val),
 });
 
 module.exports = {

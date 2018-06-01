@@ -1,3 +1,5 @@
+const { getRandomInt10: random } = require('../../helpers/random');
+
 jest.mock('../../models/userModel.js');
 
 const { makeUserModel } = require('../../models/userModel');
@@ -18,7 +20,7 @@ describe('Test of user service', () => {
     },
   };
 
-  const validGetResponse = {
+  const validListResponse = {
     data: {
       type: 'object',
       properties: {
@@ -30,7 +32,20 @@ describe('Test of user service', () => {
           },
         },
       },
+      require: ['users'],
     },
+    required: ['data'],
+  };
+
+  const validGetResponse = {
+    data: {
+      type: 'object',
+      properties: {
+        user: validUser,
+        required: ['user'],
+      },
+    },
+    required: ['data'],
   };
 
   const validInsertResponse = {
@@ -41,7 +56,9 @@ describe('Test of user service', () => {
           type: 'string',
         },
       },
+      required: ['insertedId'],
     },
+    required: ['data'],
   };
 
   beforeAll(() => {
@@ -50,50 +67,178 @@ describe('Test of user service', () => {
     });
   });
 
-  it('Should LIST users', async () => {
-    const response = await userService.list();
+  describe('Sad path', () => {
+    it('Should LIST users', async () => {
+      const response = await userService.list();
 
-    expect(response).toBeDefined();
-    expect(response).toBeInstanceOf(Object);
-    expect(response).toMatchSchema(validGetResponse);
-  });
-
-  it('Should GET one user', async () => {
-    const response = await userService.get({
-      userId: (Math.random() * 10).toFixed(0),
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Error);
     });
 
-    expect(response).toBeDefined();
-    expect(response).toBeInstanceOf(Object);
-    expect(response).toMatchSchema({
-      data: {
-        type: 'object',
-        properties: {
-          user: validUser,
+    it('Should GET one user', async () => {
+      const testId = String(random());
+      const response = await userService.get({
+        userId: testId,
+      });
+
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Error);
+    });
+
+    it('Should INSERT a new user', async () => {
+      const newUser = {
+        name: 'New user',
+      };
+
+      const response = await userService.insert(newUser);
+
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Error);
+    });
+
+    it('Should UPDATE a user', async () => {
+      const val = random();
+      const testId = String(val === 0 ? 1 : val);
+      const updateUser = {
+        userId: testId,
+        name: 'Thats a new name',
+      };
+
+      const response = await userService
+        .update(updateUser);
+
+      expect(response).toBeInstanceOf(Error);
+    });
+
+    it('Should DELETE a user', async () => {
+      const val = random();
+      const testId = String(val === 0 ? 1 : val);
+      const deleteUser = {
+        userId: testId,
+      };
+
+      const response = await userService.delete(deleteUser);
+
+      expect(response).toBe(undefined);
+
+      const {
+        data: {
+          user,
         },
-      },
+      } = await userService.get(deleteUser);
+
+      expect(user).toBeDefined();
+      expect(user).toMatchSchema(validUser);
+
+      expect(user.id).not.toBe(testId);
     });
   });
 
-  it('Should INSERT a new user', async () => {
-    const newUser = {
-      name: 'New user',
-    };
+  describe('Happy path', () => {
+    it('Should LIST users', async () => {
+      const response = await userService.list();
 
-    const response = await userService.insert(newUser);
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Object);
+      expect(response).toMatchSchema(validListResponse);
+    });
 
-    expect(response).toBeDefined();
-    expect(response).toBeInstanceOf(Object);
-    expect(response).toMatchSchema(validInsertResponse);
+    it('Should GET one user', async () => {
+      const testId = String(random());
+      const response = await userService.get({
+        userId: testId,
+      });
 
-    const {
-      data: {
-        user,
-      },
-    } = await userService.get({ userId: response.data.insertedId });
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Object);
+      expect(response).toMatchSchema(validGetResponse);
 
-    expect(user).toBeDefined();
-    expect(user).toBeInstanceOf(Object);
-    expect(newUser.name).toBe(user.name);
+      const {
+        data: {
+          user,
+        },
+      } = response;
+
+      expect(user).toMatchSchema(validUser);
+      if (user.id) {
+        expect(user.id).toBe(testId);
+      }
+    });
+
+    it('Should INSERT a new user', async () => {
+      const newUser = {
+        name: 'New user',
+      };
+
+      const response = await userService.insert(newUser);
+
+      expect(response).toBeDefined();
+      expect(response).toBeInstanceOf(Object);
+      expect(response).toMatchSchema(validInsertResponse);
+
+      const {
+        data: {
+          user,
+        },
+      } = await userService.get({
+        userId: response.data.insertedId,
+      });
+
+      expect(user).toBeDefined();
+      expect(user).toBeInstanceOf(Object);
+      expect(newUser.name).toBe(user.name);
+    });
+
+    it('Should UPDATE a user', async () => {
+      const val = random();
+      const testId = String(val === 0 ? 1 : val);
+      const updateUser = {
+        userId: testId,
+        name: 'Thats a new name',
+      };
+
+      const response = await userService
+        .update(updateUser);
+
+      expect(response).toBe(undefined);
+
+      const {
+        data: {
+          user,
+        },
+      } = await userService.get({
+        userId: testId,
+      });
+
+      expect(user).toBeDefined();
+      expect(user).toMatchSchema(validUser);
+      if (user.id) {
+        expect(user.id).toBe(updateUser.userId);
+        expect(user.name).toBe(updateUser.name);
+      }
+    });
+
+    it('Should DELETE a user', async () => {
+      const val = random();
+      const testId = String(val === 0 ? 1 : val);
+      const deleteUser = {
+        userId: testId,
+      };
+
+      const response = await userService.delete(deleteUser);
+
+      expect(response).toBe(undefined);
+
+      const {
+        data: {
+          user,
+        },
+      } = await userService.get(deleteUser);
+
+      expect(user).toBeDefined();
+      expect(user).toMatchSchema(validUser);
+
+      expect(user.id).not.toBe(testId);
+    });
   });
 });
