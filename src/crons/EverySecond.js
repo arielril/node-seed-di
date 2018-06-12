@@ -1,6 +1,8 @@
 const Logger = require('../helpers/Logger');
 
-const runner = () => Logger.info('Every second started...');
+function runner() {
+  return Logger.info('Every second started...');
+}
 
 module.exports = {
   runner,

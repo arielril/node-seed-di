@@ -1,13 +1,21 @@
-function sendResponse(res, data) {
-  res.status(data ? 200 : 204)
-    .send({
-      success: true,
-      data,
-    });
-}
+function makeUserController({ Logger, service }) {
+  return {
+    list,
+    get,
+    insert,
+    update,
+    delete: _delete,
+  };
 
-const makeUserController = ({ Logger, service }) => ({
-  list: async (req, res) => {
+  function sendResponse(res, data) {
+    res.status(data ? 200 : 204)
+      .send({
+        success: true,
+        data,
+      });
+  }
+
+  async function list(req, res) {
     try {
       const { data } = await service.list();
 
@@ -15,9 +23,9 @@ const makeUserController = ({ Logger, service }) => ({
     } catch (e) {
       Logger.throw(res, '2015167517', e);
     }
-  },
+  }
 
-  get: async (req, res) => {
+  async function get(req, res) {
     try {
       const find = {
         ...req.params,
@@ -30,9 +38,9 @@ const makeUserController = ({ Logger, service }) => ({
     } catch (e) {
       Logger.throw(res, '4076319627', e);
     }
-  },
+  }
 
-  insert: async (req, res) => {
+  async function insert(req, res) {
     try {
       const insertData = {
         ...req.body,
@@ -44,9 +52,9 @@ const makeUserController = ({ Logger, service }) => ({
     } catch (e) {
       Logger.throw(res, '2082461482', e);
     }
-  },
+  }
 
-  update: async (req, res) => {
+  async function update(req, res) {
     try {
       const updateData = {
         ...req.params,
@@ -59,9 +67,9 @@ const makeUserController = ({ Logger, service }) => ({
     } catch (e) {
       Logger.throw(res, '2351002392', e);
     }
-  },
+  }
 
-  delete: async (req, res) => {
+  async function _delete(req, res) {
     try {
       const deleteData = {
         ...req.params,
@@ -74,7 +82,7 @@ const makeUserController = ({ Logger, service }) => ({
     } catch (e) {
       throw e;
     }
-  },
-});
+  }
+}
 
 module.exports = { makeUserController };

@@ -1,5 +1,13 @@
-const makeUserService = ({ model }) => ({
-  list: async () => {
+function makeUserService({ model }) {
+  return {
+    list,
+    get,
+    insert,
+    update,
+    delete: _delete,
+  };
+
+  async function list() {
     try {
       const users = await model.list()
         .catch(() => {
@@ -16,9 +24,9 @@ const makeUserService = ({ model }) => ({
     } catch (e) {
       throw e;
     }
-  },
+  }
 
-  get: async (data) => {
+  async function get(data) {
     try {
       const {
         userId: id,
@@ -37,9 +45,9 @@ const makeUserService = ({ model }) => ({
     } catch (e) {
       throw e;
     }
-  },
+  }
 
-  insert: async (info) => {
+  async function insert(info) {
     try {
       const id = await model.insert(info)
         .catch(() => {
@@ -54,9 +62,9 @@ const makeUserService = ({ model }) => ({
     } catch (e) {
       throw e;
     }
-  },
+  }
 
-  update: async (data) => {
+  async function update(data) {
     try {
       const {
         userId: id,
@@ -90,9 +98,9 @@ const makeUserService = ({ model }) => ({
     } catch (e) {
       throw e;
     }
-  },
+  }
 
-  delete: async (info) => {
+  async function _delete(info) {
     try {
       const {
         userId: id,
@@ -116,8 +124,8 @@ const makeUserService = ({ model }) => ({
     } catch (e) {
       throw e;
     }
-  },
-});
+  }
+}
 
 module.exports = { makeUserService };
 

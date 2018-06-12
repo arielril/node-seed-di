@@ -4,22 +4,34 @@ const userType = require('../types/user');
 
 const TABLE_NAME = 'user';
 
-const makeUserModel = db => ({
-  list: () => db.from(TABLE_NAME),
+function makeUserModel(db) {
+  return {
+    list,
+    get,
+    insert,
+    update,
+    remove,
+  };
 
-  get: ({ id }) => db.from(TABLE_NAME)
-    .where('id', id)
-    .whereNot('status', userType.DELETED),
+  function list() {
+    return db.from(TABLE_NAME);
+  }
 
-  insert: (info) => {
+  function get({ id }) {
+    return db.from(TABLE_NAME)
+      .where('id', id)
+      .whereNot('status', userType.DELETED);
+  }
+
+  function insert(info) {
     const insertData = JSON.parse(JSON.stringify(info));
 
     return db.from(TABLE_NAME)
       .insert(insertData)
       .returning('id');
-  },
+  }
 
-  update: (params) => {
+  function update(params) {
     const {
       where,
       data,
@@ -31,14 +43,16 @@ const makeUserModel = db => ({
       .update(updateData)
       .where(where)
       .whereNot('status', userType.DELETED);
-  },
+  }
 
-  remove: ({ id }) => db.from(TABLE_NAME)
-    .where({ id })
-    .update({
-      status: userType.DELETED,
-      deletedAt: moment().format('YYYY-MM-DD HH:MM:ss'),
-    }),
-});
+  function remove({ id }) {
+    return db.from(TABLE_NAME)
+      .where({ id })
+      .update({
+        status: userType.DELETED,
+        deletedAt: moment().format('YYYY-MM-DD HH:MM:ss'),
+      });
+  }
+}
 
 module.exports = { makeUserModel };
