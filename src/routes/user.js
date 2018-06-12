@@ -1,7 +1,7 @@
 const express = require('express');
 const schema = require('./schemas/UserSchema');
 
-const makeUserRoutes = ({ controller }) => {
+function makeUserRoutes({ controller }) {
   const router = express.Router();
 
   router.route('/')
@@ -14,6 +14,6 @@ const makeUserRoutes = ({ controller }) => {
     .delete(schema.delete, controller.delete);
 
   return router;
-};
+}
 
 module.exports = { makeUserRoutes };

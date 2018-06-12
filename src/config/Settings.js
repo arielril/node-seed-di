@@ -1,7 +1,7 @@
 // Store settings data
 const settings = {};
 
-const load = async ({ db }) => {
+async function load({ db }) {
   const listSettings = await db.select([
     'name',
     'type',
@@ -32,7 +32,7 @@ const load = async ({ db }) => {
       }
     }
   }
-};
+}
 
 const get = key => settings[key] || null;
 
