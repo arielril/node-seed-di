@@ -69,20 +69,25 @@ describe('Test of user service', () => {
 
   describe('Sad path', () => {
     it('Should LIST users', async () => {
-      const response = await userService.list();
-
-      expect(response).toBeDefined();
-      expect(response).toBeInstanceOf(Error);
+      try {
+        await userService.list();
+      } catch (e) {
+        expect(e).toBeDefined();
+        expect(e).toBeInstanceOf(Error);
+      }
     });
 
     it('Should GET one user', async () => {
       const testId = String(random());
-      const response = await userService.get({
-        userId: testId,
-      });
 
-      expect(response).toBeDefined();
-      expect(response).toBeInstanceOf(Error);
+      try {
+        await userService.get({
+          userId: testId,
+        });
+      } catch (e) {
+        expect(e).toBeDefined();
+        expect(e).toBeInstanceOf(Error);
+      }
     });
 
     it('Should INSERT a new user', async () => {
@@ -90,10 +95,12 @@ describe('Test of user service', () => {
         name: 'New user',
       };
 
-      const response = await userService.insert(newUser);
-
-      expect(response).toBeDefined();
-      expect(response).toBeInstanceOf(Error);
+      try {
+        await userService.insert(newUser);
+      } catch (e) {
+        expect(e).toBeDefined();
+        expect(e).toBeInstanceOf(Error);
+      }
     });
 
     it('Should UPDATE a user', async () => {
@@ -104,10 +111,11 @@ describe('Test of user service', () => {
         name: 'Thats a new name',
       };
 
-      const response = await userService
-        .update(updateUser);
-
-      expect(response).toBeInstanceOf(Error);
+      try {
+        await userService.update(updateUser);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+      }
     });
 
     it('Should DELETE a user', async () => {
@@ -117,9 +125,11 @@ describe('Test of user service', () => {
         userId: testId,
       };
 
-      const response = await userService.delete(deleteUser);
-
-      expect(response).toBe(undefined);
+      try {
+        await userService.delete(deleteUser);
+      } catch (e) {
+        expect(e).toBeInstanceOf(Error);
+      }
 
       const {
         data: {
