@@ -1,4 +1,4 @@
-function makeContainer() {
+function Container() {
   const services = new Map();
   const singletons = new Map();
 
@@ -8,8 +8,8 @@ function makeContainer() {
     get
   };
 
-  function register(name, definition, dependencies) {
-    services.set(name, { definition, dependencies });
+  function register(name, definition, dependencies, isClass = false) {
+    services.set(name, { definition, dependencies, isClass });
   }
 
   function singleton(name, definition, dependencies) {
@@ -31,6 +31,9 @@ function makeContainer() {
   }
 
   function createService(service) {
+    if (service.isClass) {
+      return new service.definition(...getResolvedDependecies(service));
+    }
     return service.definition(...getResolvedDependecies(service));
   }
 
@@ -53,4 +56,4 @@ function makeContainer() {
   }
 }
 
-module.exports = makeContainer;
+module.exports = Container;

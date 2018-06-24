@@ -1,23 +1,22 @@
-function makeUserController({ Logger, service }) {
+function makeUserController(Logger, userService) {
   return {
     list,
     get,
     insert,
     update,
-    delete: _delete,
+    delete: _delete
   };
 
   function sendResponse(res, data) {
-    res.status(data ? 200 : 204)
-      .send({
-        success: true,
-        data,
-      });
+    res.status(data ? 200 : 204).send({
+      success: true,
+      data
+    });
   }
 
   async function list(req, res) {
     try {
-      const { data } = await service.list();
+      const { data } = await userService.list();
 
       sendResponse(res, data);
     } catch (e) {
@@ -29,10 +28,10 @@ function makeUserController({ Logger, service }) {
     try {
       const find = {
         ...req.params,
-        ...req.body,
+        ...req.body
       };
 
-      const { data } = await service.get(find);
+      const { data } = await userService.get(find);
 
       sendResponse(res, data);
     } catch (e) {
@@ -43,10 +42,10 @@ function makeUserController({ Logger, service }) {
   async function insert(req, res) {
     try {
       const insertData = {
-        ...req.body,
+        ...req.body
       };
 
-      const { data } = await service.insert(insertData);
+      const { data } = await userService.insert(insertData);
 
       sendResponse(res, data);
     } catch (e) {
@@ -58,10 +57,10 @@ function makeUserController({ Logger, service }) {
     try {
       const updateData = {
         ...req.params,
-        ...req.body,
+        ...req.body
       };
 
-      await service.update(updateData);
+      await userService.update(updateData);
 
       sendResponse(res);
     } catch (e) {
@@ -73,10 +72,10 @@ function makeUserController({ Logger, service }) {
     try {
       const deleteData = {
         ...req.params,
-        ...req.query,
+        ...req.query
       };
 
-      await service.delete(deleteData);
+      await userService.delete(deleteData);
 
       sendResponse(res);
     } catch (e) {
