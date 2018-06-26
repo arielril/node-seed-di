@@ -12,17 +12,22 @@ Seed project created to serve as a starting point for new projects, suggesting s
 | Code Standard  | ESLint  |  
 | Logs  | Winston |   
 | HTTP Headers  | Helmet |
-| Test Runner | Ava |
+| Test Runner | Jest |
 | DB | knex |
 | CORS  | CORS |   
 | Body Parsing  | Body Parser |   
 | Versioning  | SemVer |
+
+### Setting DB config
+
+- Create a database with the name `seedProjectDi`
 
 ### Installing and running the app with PM2
 
 ```sh
 $ npm install
 $ npm install -g pm2
+$ npm run migrate-local
 $ npm start
 ```
 
@@ -31,6 +36,7 @@ $ npm start
 ```sh
 $ npm install
 $ npm install -g nodemon
+$ npm run migrate-local
 $ npm run dev
 ```
 

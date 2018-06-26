@@ -1,9 +1,9 @@
 apps:
   - script   : 'src/server.js'
-    name     : 'service'
+    name     : 'seedProjectDiService'
     exec_mode: 'cluster'
     instances: 1
   - script   : 'src/worker.js'
-    name     : 'worker'
+    name     : 'seedProjectDiWorker'
     exec_mode: 'cluster'
     instances: 1
