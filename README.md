@@ -97,7 +97,13 @@ $ cd $HOME/.pm2/logs
 $ npm install eslint --save-dev
 $ ./node_modules/.bin/eslint src/
 ```
-### NSP
+### Vulnerability check
+
+NPM command that checks the vulnerability of the dependecies used in the project
+
+```sh
+$ npm audit
+```
 
 Command-line tool that checks the Node Security Project vulnerability database to determine if your application uses packages with known vulnerabilities. Install it as follows:
 
