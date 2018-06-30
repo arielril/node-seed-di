@@ -1,6 +1,6 @@
 const moment = require('moment-timezone');
 
-const userType = require('../types/user');
+const userType = require('../types/user.json');
 
 const TABLE_NAME = 'user';
 
