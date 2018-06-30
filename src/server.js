@@ -1,7 +1,7 @@
 /* .env lib */
 require('dotenv').config();
 
-const Settings = require('./config/Settings');
+const Settings = require('./config/settings');
 const debug = require('debug')('app');
 const { knex } = require('./config/db');
 

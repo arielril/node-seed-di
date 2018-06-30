@@ -44,19 +44,20 @@ let userList = [
 ];
 
 const list = jest.fn()
-  .mockImplementation(async () => userList)
-  .mockReturnValueOnce(Promise.reject());
+  .mockImplementation(async () => userList);
 
 const get = jest.fn()
   .mockImplementation(async ({ id }) => {
-    id = parseInt(id, 10);
-    if (userList.length < id) {
-      return [];
+    let getId;
+    if (id) {
+      getId = parseInt(id, 10);
+      if (userList.length < getId) {
+        return [];
+      }
     }
 
-    return userList.find(user => user.id === String(id)) || {};
-  })
-  .mockReturnValueOnce(Promise.reject());
+    return userList.find(user => user.id === String(getId)) || {};
+  });
 
 const insert = jest.fn()
   .mockImplementation(async (info) => {
@@ -72,8 +73,7 @@ const insert = jest.fn()
     userList.push(newUser);
 
     return String(nextId);
-  })
-  .mockReturnValueOnce(Promise.reject());
+  });
 
 const update = jest.fn().mockImplementation(async (params) => {
   const {
@@ -86,33 +86,36 @@ const update = jest.fn().mockImplementation(async (params) => {
     },
   } = params;
 
-  id = parseInt(id, 10);
+  if (id) {
+    id = parseInt(id, 10);
 
-  if (id > userList.length) {
-    return;
+    if (id > userList.length) {
+      return;
+    }
+
+    const old = userList[id - 1];
+
+    userList[id - 1] = {
+      ...old,
+      ...data,
+    };
   }
-
-  const old = userList[id - 1];
-
-  userList[id - 1] = {
-    ...old,
-    ...data,
-  };
-})
-  .mockReturnValueOnce(Promise.reject());
+});
 
 const remove = jest.fn().mockImplementation(async ({ id }) => {
-  id = parseInt(id, 10);
+  if (id) {
+    const removeId = parseInt(id, 10);
 
-  if (id > userList.length) {
-    return;
+    if (removeId > userList.length) {
+      return;
+    }
+
+    userList[removeId - 1] = undefined;
   }
 
-  userList[id - 1] = undefined;
 
   userList = userList.filter(user => user);
-})
-  .mockReturnValueOnce(Promise.reject());
+});
 
 const makeUserModel = () => ({
   list,
@@ -120,7 +123,6 @@ const makeUserModel = () => ({
   insert,
   update,
   remove,
-  // catch: jest.fn().mockImplementation(val => val),
 });
 
 module.exports = {

@@ -9,7 +9,6 @@ describe('Test of user service', () => {
   let userService;
 
   const validUser = {
-    id: { type: 'string' },
     name: { type: 'string' },
     status: { type: 'string' },
     createdAt: { type: 'string' },
@@ -119,8 +118,7 @@ describe('Test of user service', () => {
     });
 
     it('Should DELETE a user', async () => {
-      const val = random();
-      const testId = String(val === 0 ? 1 : val);
+      const testId = '1';
       const deleteUser = {
         userId: testId,
       };
@@ -139,7 +137,6 @@ describe('Test of user service', () => {
 
       expect(user).toBeDefined();
       expect(user).toMatchSchema(validUser);
-
       expect(user.id).not.toBe(testId);
     });
   });
