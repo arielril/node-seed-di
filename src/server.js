@@ -1,19 +1,24 @@
 /* .env lib */
 require('dotenv').config();
 
-const Settings = require('./config/Settings');
+const Settings = require('./config/settings');
 const debug = require('debug')('app');
-const LoggerConfig = require('./config/LoggerConfig');
 const { knex } = require('./config/db');
 
 const app = require('./app');
 
+/* Logger */
+const LoggerConfig = require('./config/LoggerConfig');
+
+/* Log express request and response */
+LoggerConfig.expressRequest(app);
+
+/* Log errors */
+LoggerConfig.expressError(app);
+
 debug('load settings');
 (async () => {
-  await Settings.load({ db: knex })
-    .catch((err) => {
-      console.log('ERRO SETTING LOAD', err);
-    });
+  await Settings.load({ db: knex });
   await LoggerConfig.init();
 
   debug('Starting server');

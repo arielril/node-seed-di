@@ -1,3 +1,5 @@
+const { customError } = require('../helpers/customError');
+
 function makeUserService({ model }) {
   return {
     list,
@@ -11,7 +13,7 @@ function makeUserService({ model }) {
     try {
       const users = await model.list()
         .catch(() => {
-          throw new Error('Não foi possível listar usuários');
+          throw customError('772042367', 'Não foi possível listar usuários');
         });
 
       const result = users.map(item => item);
@@ -34,12 +36,12 @@ function makeUserService({ model }) {
 
       const user = await model.get({ id })
         .catch(() => {
-          throw new Error('Falha ao adiquirir usuario');
+          throw customError('772042367', 'Falha ao adiquirir usuario');
         });
 
       return {
         data: {
-          user,
+          user: Array.isArray(user) ? {} : user,
         },
       };
     } catch (e) {
@@ -51,7 +53,7 @@ function makeUserService({ model }) {
     try {
       const id = await model.insert(info)
         .catch(() => {
-          throw new Error('Não foi possível adicionar usuário');
+          throw customError('772042367', 'Não foi possível adicionar usuário');
         });
 
       return {
@@ -73,11 +75,11 @@ function makeUserService({ model }) {
 
       const user = await model.get({ id })
         .catch(() => {
-          throw new Error('Usuário inexistente');
+          throw customError('772042367', 'Usuário inexistente');
         });
 
       if (!user) {
-        throw new Error('Usuário inexistente');
+        throw customError('772042367', 'Usuário inexistente');
       }
 
       const updateData = {
@@ -91,7 +93,7 @@ function makeUserService({ model }) {
 
       await model.update(updateData)
         .catch(() => {
-          throw new Error('Falha ao atualizar usuário');
+          throw customError('772042367', 'Falha ao atualizar usuário');
         });
 
       return;
@@ -108,16 +110,16 @@ function makeUserService({ model }) {
 
       const user = await model.get({ id })
         .catch(() => {
-          throw new Error('Usuário inexistente');
+          throw customError('772042367', 'Usuário inexistente');
         });
 
       if (!user) {
-        throw new Error('Usuário inexistente');
+        throw customError('772042367', 'Usuário inexistente');
       }
 
       await model.remove({ id })
         .catch(() => {
-          throw new Error('Falha ao deletar usuário');
+          throw customError('772042367', 'Falha ao deletar usuário');
         });
 
       return;
