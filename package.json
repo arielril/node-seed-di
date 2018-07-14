@@ -38,6 +38,7 @@
     "express": "^4.16.2",
     "express-winston": "^2.4.0",
     "helmet": "^3.9.0",
+    "jest-json-schema": "^2.0.0",
     "joi": "^13.1.0",
     "knex": "^0.14.2",
     "knex-migrate": "^1.5.5",
