@@ -1,49 +1,38 @@
-const winston = require('winston');
+function makeLogger({ logger }) {
+  return {
+    alert,
+    critic,
+    error,
+    warning,
+    throw: _throw,
+  };
 
-/* Logger use RFC5424 */
-class Logger {
-  static emerg(...emerg) {
-    winston.log('emerg', ...emerg);
+  function alert(...args) {
+    logger.alert(args);
   }
 
-  static alert(...alert) {
-    winston.log('alert', ...alert);
+  function critic(...args) {
+    logger.critic(args);
   }
 
-  static crit(...crit) {
-    winston.log('crit', ...crit);
+  function error(...args) {
+    logger.error(args);
   }
 
-  static error(...error) {
-    winston.log('error', ...error);
+  function warning(...args) {
+    logger.warn(args);
   }
 
-  static warning(...warning) {
-    winston.log('warning', ...warning);
-  }
+  function _throw(...args) {
+    const [res, code, err] = args && args.length > 0 ? args : [];
 
-  static notice(...notice) {
-    winston.log('notice', ...notice);
-  }
-
-  static info(...info) {
-    winston.log('info', ...info);
-  }
-
-  static blacklists(req, list = []) {
-    req._routeBlacklists.body = list; // eslint-disable-line
-  }
-
-  static throw(res, code, ...args) {
-    const [error] = args && args.length > 0 ? args : [null];
-
-    if (error && error.code) {
-      code += `.${error.code}`; // eslint-disable-line
+    if (err && err.code) {
+      code += `.${err.code}`;
     }
 
-    const message = error && error.message ? error.message : res.__('helpers.logger.throw');
+    const message = err && err.message ? err.message : 'logger throw';
 
-    this.error(...args);
+    error(...args);
     res.status(500)
       .send({
         success: false,
@@ -53,4 +42,4 @@ class Logger {
   }
 }
 
-module.exports = Logger;
+module.exports = makeLogger;

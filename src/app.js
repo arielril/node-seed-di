@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
+const bunyan = require('bunyan').createLogger({ name: 'some-app-name' });
 
 const { knex } = require('./config/db');
 const { makeUserModel } = require('./models/userModel');
@@ -19,7 +20,9 @@ const app = express();
 
 /* Logger */
 const LoggerConfig = require('./config/LoggerConfig');
-const Logger = require('./helpers/Logger');
+const Logger = require('./helpers/logger')({
+  logger: bunyan,
+});
 
 /* Controllers */
 const userController = makeUserController({

@@ -4,8 +4,8 @@ const request = require('request');
 const debug = require('request-debug');
 const moment = require('moment-timezone');
 const { clone, each } = require('lodash');
-const Logger = require('../helpers/Logger');
-const Settings = require('./Settings');
+const Logger = require('../helpers/logger');
+const Settings = require('./settings');
 
 const instances = {
   init: false,
