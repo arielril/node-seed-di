@@ -140,7 +140,7 @@ class LoggerConfig {
     instances.expressError = true;
     app.use(expressWinston.errorLogger(this.getLoggerOptions()));
 
-    app.use((err, req, res, next) => { // eslint-disable-line
+    app.use((err, req, res) => {
       res.status(err.status || 500);
       res.send({ code: 0, message: 'Falha interna do servidor' });
     });

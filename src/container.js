@@ -5,10 +5,10 @@ function Container() {
   return {
     register,
     singleton,
-    get
+    get,
   };
 
-  function register(name, definition, dependencies, isClass = false) {
+  function register(name, definition, dependencies, isClass = false) { // eslint-disable-line
     services.set(name, { definition, dependencies, isClass });
   }
 
@@ -23,16 +23,15 @@ function Container() {
   function getResolvedDependecies(service) {
     let serviceDependencies = [];
     if (service.dependencies) {
-      serviceDependencies = service.dependencies.map(dependencie => {
-        return get(dependencie);
-      });
+      serviceDependencies = service.dependencies.map(dependencie => get(dependencie));
     }
+
     return serviceDependencies;
   }
 
   function createService(service) {
     if (service.isClass) {
-      return new service.definition(...getResolvedDependecies(service));
+      return new service.definition(...getResolvedDependecies(service)); // eslint-disable-line
     }
     return service.definition(...getResolvedDependecies(service));
   }

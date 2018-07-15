@@ -17,7 +17,7 @@ LoggerConfig.expressRequest(app);
 LoggerConfig.expressError(app);
 
 debug('load settings');
-(async () => {
+const serve = async () => {
   await Settings.load({ db: knex });
   await LoggerConfig.init();
 
@@ -25,4 +25,6 @@ debug('load settings');
   app.listen(process.env.PORT, () => {
     debug(`Server started on port ${process.env.PORT}`);
   });
-})();
+};
+
+serve();

@@ -11,22 +11,23 @@ const bunyan = require('bunyan').createLogger({ name: 'some-app-name' });
 const container = require('./container')();
 
 const { knex } = require('./config/db');
-const { makeUserModel } = require('./models/UserModel');
-const { makeUserService } = require('./services/UserService');
-const { makeUserController } = require('./controllers/UserController');
+const { makeUserModel } = require('./models/userModel');
+const { makeUserService } = require('./services/userService');
+const { makeUserController } = require('./controllers/userController');
 
 /* Logger */
 const LoggerConfig = require('./config/LoggerConfig');
-const Logger = require('./helpers/logger')({
+const logger = require('./helpers/logger')({
   logger: bunyan,
 });
 
 container.register('db', knex);
-container.register('Logger', Logger, null, true);
+// TODO: verificar se o logger tem como dependencia as suas configuracoes
+container.register('logger', logger, null);
 container.register('userModel', makeUserModel, ['db']);
 container.register('userService', makeUserService, ['userModel']);
 container.register('userController', makeUserController, [
-  'Logger',
+  'logger',
   'userService',
 ]);
 
@@ -52,7 +53,7 @@ app.get(['/', '/status'], async (req, res) => {
   try {
     res.send('ok');
   } catch (err) {
-    Logger.error(err);
+    logger.error(err);
     res.status(500).send('error');
   }
 });

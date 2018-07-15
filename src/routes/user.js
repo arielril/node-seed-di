@@ -1,5 +1,5 @@
 const express = require('express');
-const schema = require('./schemas/UserSchema');
+const schema = require('./schemas/userSchema');
 
 function makeUserRoutes(app) {
   const container = app.get('context');

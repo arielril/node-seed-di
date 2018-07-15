@@ -1,12 +1,12 @@
 const { customError } = require('../helpers/customError');
 
-function makeUserService({ model }) {
+function makeUserService(model) {
   return {
     list,
     get,
     insert,
     update,
-    delete: _delete
+    delete: _delete,
   };
 
   async function list() {
@@ -20,8 +20,8 @@ function makeUserService({ model }) {
 
       return {
         data: {
-          users: result
-        }
+          users: result,
+        },
       };
     } catch (e) {
       throw e;
@@ -56,8 +56,8 @@ function makeUserService({ model }) {
 
       return {
         data: {
-          insertedId: id
-        }
+          insertedId: id,
+        },
       };
     } catch (e) {
       throw e;
@@ -79,11 +79,11 @@ function makeUserService({ model }) {
 
       const updateData = {
         where: {
-          id
+          id,
         },
         data: {
-          name
-        }
+          name,
+        },
       };
 
       await model.update(updateData)

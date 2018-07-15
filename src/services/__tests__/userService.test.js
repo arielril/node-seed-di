@@ -61,9 +61,8 @@ describe('Test of user service', () => {
   };
 
   beforeAll(() => {
-    userService = makeUserService({
-      model: makeUserModel(),
-    });
+    const model = makeUserModel();
+    userService = makeUserService(model);
   });
 
   describe('Sad path', () => {

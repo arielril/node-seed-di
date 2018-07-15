@@ -1,16 +1,16 @@
-function makeUserController(Logger, userService) {
+function makeUserController(logger, userService) {
   return {
     list,
     get,
     insert,
     update,
-    delete: _delete
+    delete: _delete,
   };
 
   function sendResponse(res, data) {
     res.status(data ? 200 : 204).send({
       success: true,
-      data
+      data,
     });
   }
 
@@ -20,7 +20,7 @@ function makeUserController(Logger, userService) {
 
       sendResponse(res, data);
     } catch (e) {
-      Logger.throw(res, '2015167517', e);
+      logger.throw(res, '2015167517', e);
     }
   }
 
@@ -28,28 +28,28 @@ function makeUserController(Logger, userService) {
     try {
       const find = {
         ...req.params,
-        ...req.body
+        ...req.body,
       };
 
       const { data } = await userService.get(find);
 
       sendResponse(res, data);
     } catch (e) {
-      Logger.throw(res, '4076319627', e);
+      logger.throw(res, '4076319627', e);
     }
   }
 
   async function insert(req, res) {
     try {
       const insertData = {
-        ...req.body
+        ...req.body,
       };
 
       const { data } = await userService.insert(insertData);
 
       sendResponse(res, data);
     } catch (e) {
-      Logger.throw(res, '2082461482', e);
+      logger.throw(res, '2082461482', e);
     }
   }
 
@@ -57,14 +57,14 @@ function makeUserController(Logger, userService) {
     try {
       const updateData = {
         ...req.params,
-        ...req.body
+        ...req.body,
       };
 
       await userService.update(updateData);
 
       sendResponse(res);
     } catch (e) {
-      Logger.throw(res, '2351002392', e);
+      logger.throw(res, '2351002392', e);
     }
   }
 
@@ -72,7 +72,7 @@ function makeUserController(Logger, userService) {
     try {
       const deleteData = {
         ...req.params,
-        ...req.query
+        ...req.query,
       };
 
       await userService.delete(deleteData);
