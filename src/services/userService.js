@@ -6,7 +6,7 @@ function makeUserService({ model }) {
     get,
     insert,
     update,
-    delete: _delete,
+    delete: _delete
   };
 
   async function list() {
@@ -20,8 +20,8 @@ function makeUserService({ model }) {
 
       return {
         data: {
-          users: result,
-        },
+          users: result
+        }
       };
     } catch (e) {
       throw e;
@@ -30,9 +30,7 @@ function makeUserService({ model }) {
 
   async function get(data) {
     try {
-      const {
-        userId: id,
-      } = data;
+      const { userId: id } = data;
 
       const user = await model.get({ id })
         .catch(() => {
@@ -58,8 +56,8 @@ function makeUserService({ model }) {
 
       return {
         data: {
-          insertedId: id,
-        },
+          insertedId: id
+        }
       };
     } catch (e) {
       throw e;
@@ -68,10 +66,7 @@ function makeUserService({ model }) {
 
   async function update(data) {
     try {
-      const {
-        userId: id,
-        name,
-      } = data;
+      const { userId: id, name } = data;
 
       const user = await model.get({ id })
         .catch(() => {
@@ -84,11 +79,11 @@ function makeUserService({ model }) {
 
       const updateData = {
         where: {
-          id,
+          id
         },
         data: {
-          name,
-        },
+          name
+        }
       };
 
       await model.update(updateData)
@@ -104,9 +99,7 @@ function makeUserService({ model }) {
 
   async function _delete(info) {
     try {
-      const {
-        userId: id,
-      } = info;
+      const { userId: id } = info;
 
       const user = await model.get({ id })
         .catch(() => {
@@ -130,4 +123,3 @@ function makeUserService({ model }) {
 }
 
 module.exports = { makeUserService };
-

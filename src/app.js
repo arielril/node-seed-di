@@ -8,15 +8,12 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
 const bunyan = require('bunyan').createLogger({ name: 'some-app-name' });
+const container = require('./container')();
 
 const { knex } = require('./config/db');
-const { makeUserModel } = require('./models/userModel');
-const { makeUserService } = require('./services/userService');
-const { makeUserController } = require('./controllers/userController');
-const { makeUserRoutes } = require('./routes/user');
-
-/* Express initialization */
-const app = express();
+const { makeUserModel } = require('./models/UserModel');
+const { makeUserService } = require('./services/UserService');
+const { makeUserController } = require('./controllers/UserController');
 
 /* Logger */
 const LoggerConfig = require('./config/LoggerConfig');
@@ -24,18 +21,23 @@ const Logger = require('./helpers/logger')({
   logger: bunyan,
 });
 
-/* Controllers */
-const userController = makeUserController({
-  Logger,
-  service: makeUserService({
-    model: makeUserModel(knex),
-  }),
-});
+container.register('db', knex);
+container.register('Logger', Logger, null, true);
+container.register('userModel', makeUserModel, ['db']);
+container.register('userService', makeUserService, ['userModel']);
+container.register('userController', makeUserController, [
+  'Logger',
+  'userService',
+]);
+
+const { makeUserRoutes } = require('./routes/user');
+
+/* Express initialization */
+const app = express();
+app.set('context', container);
 
 /* Routes */
-const userRoutes = makeUserRoutes({
-  controller: userController,
-});
+const userRoutes = makeUserRoutes(app);
 
 /* Express utilites */
 app.use(helmet());
