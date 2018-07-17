@@ -7,23 +7,20 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
-const bunyan = require('bunyan').createLogger({ name: 'some-app-name' });
 const container = require('./container')();
 
+// make dependencies
 const { knex } = require('./config/db');
 const { makeUserModel } = require('./models/userModel');
 const { makeUserService } = require('./services/userService');
 const { makeUserController } = require('./controllers/userController');
+const { makeLogger } = require('./helpers/logger');
+const bunyan = require('./config/bunyan.config');
 
-/* Logger */
-const LoggerConfig = require('./config/LoggerConfig');
-const logger = require('./helpers/logger')({
-  logger: bunyan,
-});
-
+/* Attach dependencies */
 container.register('db', knex);
-// TODO: verificar se o logger tem como dependencia as suas configuracoes
-container.register('logger', logger, null);
+container.singleton('loggerConfig', bunyan);
+container.register('logger', makeLogger, ['loggerConfig']);
 container.register('userModel', makeUserModel, ['db']);
 container.register('userService', makeUserService, ['userModel']);
 container.register('userController', makeUserController, [
@@ -53,6 +50,7 @@ app.get(['/', '/status'], async (req, res) => {
   try {
     res.send('ok');
   } catch (err) {
+    const logger = container.get('logger');
     logger.error(err);
     res.status(500).send('error');
   }
@@ -61,6 +59,7 @@ app.get(['/', '/status'], async (req, res) => {
 /* Instatiate routes */
 app.use('/user', userRoutes);
 
+/* 404 - NOT FOUND ROUTE RESPONSE */
 app.all('*', (req, res) => {
   res.status(404).send({ success: false, code: '404' });
 });

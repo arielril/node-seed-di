@@ -1,14 +1,19 @@
-function makeLogger({ logger }) {
+function makeLogger(logger) {
   return {
-    alert,
+    info,
     critic,
     error,
-    warning,
+    warn,
     throw: _throw,
+    debug,
   };
 
-  function alert(...args) {
-    logger.alert(args);
+  function debug(...args) {
+    logger.debug(...args);
+  }
+
+  function info(...args) {
+    logger.info(args);
   }
 
   function critic(...args) {
@@ -19,15 +24,16 @@ function makeLogger({ logger }) {
     logger.error(args);
   }
 
-  function warning(...args) {
+  function warn(...args) {
     logger.warn(args);
   }
 
   function _throw(...args) {
+    // TODO: reescrever funcao para compartilhar com customError
     const [res, code, err] = args && args.length > 0 ? args : [];
-
+    let errorCode = code;
     if (err && err.code) {
-      code += `.${err.code}`;
+      errorCode += `.${err.code}`;
     }
 
     const message = err && err.message ? err.message : 'logger throw';
@@ -36,10 +42,10 @@ function makeLogger({ logger }) {
     res.status(500)
       .send({
         success: false,
-        code,
+        code: errorCode,
         message,
       });
   }
 }
 
-module.exports = makeLogger;
+module.exports = { makeLogger };
