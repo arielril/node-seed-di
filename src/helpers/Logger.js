@@ -1,47 +1,57 @@
-const winston = require('winston');
-
 /* Logger use RFC5424 */
-class Logger {
-  static emerg(...emerg) {
-    winston.log('emerg', ...emerg);
+function makeLogger(logger) {
+  return {
+    emerg,
+    alert,
+    crit,
+    error,
+    warning,
+    notice,
+    info,
+    blacklists,
+    throw: _throw,
+  };
+
+  function emerg(...args) {
+    logger.log('emerg', ...args);
   }
 
-  static alert(...alert) {
-    winston.log('alert', ...alert);
+  function alert(...args) {
+    logger.log('alert', ...args);
   }
 
-  static crit(...crit) {
-    winston.log('crit', ...crit);
+  function crit(...args) {
+    logger.log('crit', ...args);
   }
 
-  static error(...error) {
-    winston.log('error', ...error);
+  function error(...args) {
+    logger.log('error', ...args);
   }
 
-  static warning(...warning) {
-    winston.log('warning', ...warning);
+  function warning(...args) {
+    logger.log('warning', ...args);
   }
 
-  static notice(...notice) {
-    winston.log('notice', ...notice);
+  function notice(...args) {
+    logger.log('notice', ...args);
   }
 
-  static info(...info) {
-    winston.log('info', ...info);
+  function info(...args) {
+    logger.log('info', ...args);
   }
 
-  static blacklists(req, list = []) {
+  function blacklists(req, list = []) {
     req._routeBlacklists.body = list; // eslint-disable-line
   }
 
-  static throw(res, code, ...args) {
-    const [error] = args && args.length > 0 ? args : [null];
+  function _throw(res, code, ...args) {
+    const [err] = args && args.length > 0 ? args : [null];
 
-    if (error && error.code) {
-      code += `.${error.code}`; // eslint-disable-line
+    if (err && err.code) {
+      code += `.${err.code}`; // eslint-disable-line
     }
 
-    const message = error && error.message ? error.message : res.__('helpers.logger.throw');
+    const message = err && err.message ? err.message : res.__('helpers.logger.throw');
 
     this.error(...args);
     res.status(500)
@@ -53,4 +63,4 @@ class Logger {
   }
 }
 
-module.exports = Logger;
+module.exports = { makeLogger };

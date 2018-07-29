@@ -4,8 +4,6 @@ const request = require('request');
 const debug = require('request-debug');
 const moment = require('moment-timezone');
 const { clone, each } = require('lodash');
-const Logger = require('../helpers/logger');
-const Settings = require('./settings');
 
 const instances = {
   init: false,
@@ -13,8 +11,14 @@ const instances = {
   expressError: false,
 };
 
-class LoggerConfig {
-  static init() {
+function makeLoggerConf({ settings, logger }) {
+  return {
+    init,
+    expressRequest,
+    expressError,
+  };
+
+  function init() {
     if (instances.init) {
       throw Error('Logger: init already executed');
     }
@@ -22,17 +26,17 @@ class LoggerConfig {
     instances.init = true;
     winston.configure({
       exitOnError: false,
-      levels: this.getLevels(),
-      colors: this.getColors(),
-      transports: this.getTransports(),
+      levels: getLevels(),
+      colors: getColors(),
+      transports: getTransports(),
     });
 
-    debug(request, this.requestDebugFormatter);
+    debug(request, requestDebugFormatter);
     expressWinston.requestWhitelist.push('body');
     expressWinston.responseWhitelist.push('body');
   }
 
-  static getTransports() {
+  function getTransports() {
     const transports = [
       new winston.transports.Console({
         timestamp: () => {
@@ -47,7 +51,7 @@ class LoggerConfig {
     return transports;
   }
 
-  static getLevels() {
+  function getLevels() {
     return {
       emerg: 0,
       alert: 1,
@@ -60,7 +64,7 @@ class LoggerConfig {
     };
   }
 
-  static getColors() {
+  function getColors() {
     return {
       emerg: 'bgRed',
       alert: 'bgMagenta',
@@ -73,7 +77,7 @@ class LoggerConfig {
     };
   }
 
-  static requestDebugFormatter(type, data) {
+  function requestDebugFormatter(type, data) {
     let message = null;
     let status = 0;
 
@@ -98,47 +102,47 @@ class LoggerConfig {
     }
 
     if (message) {
-      switch (LoggerConfig.getLevelByStatusCode(status)) {
-        case 'warning': Logger.warning(message); break;
-        case 'error': Logger.error(message); break;
-        case 'crit': Logger.crit(message); break;
-        default: Logger.info(message);
+      switch (getLevelByStatusCode(status)) {
+        case 'warning': logger.warning(message); break;
+        case 'error': logger.error(message); break;
+        case 'crit': logger.crit(message); break;
+        default: logger.info(message);
       }
     } else {
-      Logger.warning(type, data);
+      logger.warning(type, data);
     }
   }
 
-  static replacePropertyValue(keys, object) {
+  function replacePropertyValue(keys, object) {
     const newObject = clone(object);
 
     each(object, (val, key) => {
       if (keys.indexOf(key) !== -1) {
         newObject[key] = '******';
       } else if (typeof (val) === 'object') {
-        newObject[key] = LoggerConfig.replacePropertyValue(keys, val);
+        newObject[key] = replacePropertyValue(keys, val);
       }
     });
 
     return newObject;
   }
 
-  static expressRequest(app) {
+  function expressRequest(app) {
     if (instances.expressRequest) {
       throw Error('Logger: expressRequest already executed');
     }
 
     instances.expressRequest = true;
-    app.use(expressWinston.logger(this.getLoggerOptions()));
+    app.use(expressWinston.logger(getLoggerOptions()));
   }
 
-  static expressError(app) {
+  function expressError(app) {
     if (instances.expressError) {
       throw Error('Logger: expressError already executed');
     }
 
     instances.expressError = true;
-    app.use(expressWinston.errorLogger(this.getLoggerOptions()));
+    app.use(expressWinston.errorLogger(getLoggerOptions()));
 
     app.use((err, req, res, next) => { // eslint-disable-line
       res.status(err.status || 500);
@@ -146,7 +150,7 @@ class LoggerConfig {
     });
   }
 
-  static getLevelByStatusCode(code) {
+  function getLevelByStatusCode(code) {
     let level = 'info';
     if (code >= 400) { level = 'warning'; }
     if (code >= 500) { level = 'error'; }
@@ -154,10 +158,10 @@ class LoggerConfig {
     return level;
   }
 
-  static getLoggerOptions() {
+  function getLoggerOptions() {
     const requestFilterBlacklist = ['headers', 'httpVersion', 'originalUrl'];
     const responseFilterBlacklist = [];
-    const bodyBlacklist = Settings.get('LOG_BODY_BLACKLIST') || [];
+    const bodyBlacklist = settings.get('LOG_BODY_BLACKLIST') || [];
     const ignoredRoutes = ['/', '/status', '/favicon.ico'];
 
     return {
@@ -179,7 +183,7 @@ class LoggerConfig {
         }
 
         if (propName === 'body' && res[propName] && bodyBlacklist.length > 0) {
-          return LoggerConfig.replacePropertyValue(bodyBlacklist, res[propName]);
+          return replacePropertyValue(bodyBlacklist, res[propName]);
         }
 
         return res[propName];
@@ -202,4 +206,6 @@ class LoggerConfig {
   }
 }
 
-module.exports = LoggerConfig;
+module.exports = {
+  makeLoggerConf,
+};
