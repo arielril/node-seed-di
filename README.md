@@ -12,17 +12,22 @@ Seed project created to serve as a starting point for new projects, suggesting s
 | Code Standard  | ESLint  |  
 | Logs  | Winston |   
 | HTTP Headers  | Helmet |
-| Test Runner | Ava |
+| Test Runner | Jest |
 | DB | knex |
 | CORS  | CORS |   
 | Body Parsing  | Body Parser |   
 | Versioning  | SemVer |
+
+### Setting DB config
+
+- Create a database with the name `seedProjectDi`
 
 ### Installing and running the app with PM2
 
 ```sh
 $ npm install
 $ npm install -g pm2
+$ npm run migrate-local
 $ npm start
 ```
 
@@ -31,6 +36,7 @@ $ npm start
 ```sh
 $ npm install
 $ npm install -g nodemon
+$ npm run migrate-local
 $ npm run dev
 ```
 
@@ -91,7 +97,13 @@ $ cd $HOME/.pm2/logs
 $ npm install eslint --save-dev
 $ ./node_modules/.bin/eslint src/
 ```
-### NSP
+### Vulnerability check
+
+NPM command that checks the vulnerability of the dependecies used in the project
+
+```sh
+$ npm audit
+```
 
 Command-line tool that checks the Node Security Project vulnerability database to determine if your application uses packages with known vulnerabilities. Install it as follows:
 
