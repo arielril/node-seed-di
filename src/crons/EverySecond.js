@@ -1,4 +1,4 @@
-const Logger = require('../helpers/Logger');
+const Logger = require('../helpers/logger');
 
 function runner() {
   return Logger.info('Every second started...');

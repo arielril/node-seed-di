@@ -7,7 +7,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
-const Logger = require('./helpers/Logger');
+const Logger = require('./helpers/logger');
 
 const { knex } = require('./config/db');
 const { makeUserModel } = require('./models/userModel');

@@ -3,16 +3,16 @@ require('dotenv').config();
 const debug = require('debug')('worker');
 
 /* Settings */
-const Settings = require('./config/Settings');
+const Settings = require('./config/settings');
 
 /* Logger */
-const LoggerConfig = require('./config/LoggerConfig');
+const LoggerConfig = require('./config/loggerConfig');
 
 /* Dependencies */
-const Cron = require('./helpers/Cron');
+const Cron = require('./helpers/cron');
 
 /* Crons */
-const EverySecond = require('./crons/EverySecond.js');
+const EverySecond = require('./crons/everySecond.js');
 
 /* Services */
 const services = [];

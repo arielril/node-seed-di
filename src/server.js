@@ -8,7 +8,7 @@ const { knex } = require('./config/db');
 const app = require('./app');
 
 /* Logger */
-const LoggerConfig = require('./config/LoggerConfig');
+const LoggerConfig = require('./config/loggerConfig');
 
 /* Log express request and response */
 LoggerConfig.expressRequest(app);
