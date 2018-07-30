@@ -7,20 +7,24 @@ const helmet = require('helmet');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const compression = require('compression');
-const Logger = require('./helpers/logger');
+const winston = require('winston');
 
 const { knex } = require('./config/db');
 const { makeUserModel } = require('./models/userModel');
 const { makeUserService } = require('./services/userService');
 const { makeUserController } = require('./controllers/userController');
 const { makeUserRoutes } = require('./routes/user');
+const { makeLogger } = require('./helpers/logger');
 
 /* Express initialization */
 const app = express();
 
+/* Logger */
+const logger = makeLogger(winston);
+
 /* Controllers */
 const userController = makeUserController({
-  Logger,
+  logger,
   service: makeUserService({
     model: makeUserModel(knex),
   }),
@@ -44,7 +48,7 @@ app.get(['/', '/status'], async (req, res) => {
   try {
     res.send('ok');
   } catch (err) {
-    Logger.error(err);
+    logger.error(err);
     res.status(500).send('error');
   }
 });

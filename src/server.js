@@ -1,25 +1,25 @@
 /* .env lib */
 require('dotenv').config();
 
-const Settings = require('./config/settings');
+const settings = require('./config/settings');
 const debug = require('debug')('app');
+const winston = require('winston');
 const { knex } = require('./config/db');
+const { makeLogger } = require('./helpers/logger');
+const { makeLoggerConf } = require('./config/loggerConfig');
 
 const app = require('./app');
 
 /* Logger */
-const LoggerConfig = require('./config/loggerConfig');
-
-/* Log express request and response */
-LoggerConfig.expressRequest(app);
-
-/* Log errors */
-LoggerConfig.expressError(app);
+const logger = makeLogger(winston);
 
 debug('load settings');
 (async () => {
-  await Settings.load({ db: knex });
-  await LoggerConfig.init();
+  await settings.load({ db: knex });
+  const loggerConfig = makeLoggerConf({ settings, logger });
+  loggerConfig.init();
+  loggerConfig.expressError(app);
+  loggerConfig.expressRequest(app);
 
   debug('Starting server');
   app.listen(process.env.PORT, () => {
