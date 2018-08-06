@@ -13,27 +13,26 @@ const { knex } = require('./config/db');
 const { makeUserModel } = require('./models/userModel');
 const { makeUserService } = require('./services/userService');
 const { makeUserController } = require('./controllers/userController');
-const { makeUserRoutes } = require('./routes/user');
 const { makeLogger } = require('./helpers/logger');
+const { makeUserRoutes } = require('./routes/user');
+const container = require('./container')();
+
+container.register('db', knex);
+container.register('winston', winston, null);
+container.singleton('Logger', makeLogger, ['winston']);
+container.register('userModel', makeUserModel, ['db']);
+container.register('userService', makeUserService, ['userModel']);
+container.register('userController', makeUserController, [
+  'Logger',
+  'userService',
+]);
 
 /* Express initialization */
 const app = express();
-
-/* Logger */
-const logger = makeLogger(winston);
-
-/* Controllers */
-const userController = makeUserController({
-  logger,
-  service: makeUserService({
-    model: makeUserModel(knex),
-  }),
-});
+app.set('context', container);
 
 /* Routes */
-const userRoutes = makeUserRoutes({
-  controller: userController,
-});
+const userRoutes = makeUserRoutes(app);
 
 /* Express utilites */
 app.use(helmet());
@@ -48,6 +47,7 @@ app.get(['/', '/status'], async (req, res) => {
   try {
     res.send('ok');
   } catch (err) {
+    const logger = container.get('Logger');
     logger.error(err);
     res.status(500).send('error');
   }

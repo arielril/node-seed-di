@@ -1,6 +1,4 @@
-const { customError } = require('../helpers/customError');
-
-function makeUserService({ model }) {
+function makeUserService(userModel) {
   return {
     list,
     get,
@@ -11,10 +9,9 @@ function makeUserService({ model }) {
 
   async function list() {
     try {
-      const users = await model.list()
-        .catch(() => {
-          throw customError('772042367', 'Não foi possível listar usuários');
-        });
+      const users = await userModel.list().catch(() => {
+        throw new Error('Não foi possível listar usuários');
+      });
 
       const result = users.map(item => item);
 
@@ -30,18 +27,15 @@ function makeUserService({ model }) {
 
   async function get(data) {
     try {
-      const {
-        userId: id,
-      } = data;
+      const { userId: id } = data;
 
-      const user = await model.get({ id })
-        .catch(() => {
-          throw customError('772042367', 'Falha ao adiquirir usuario');
-        });
+      const user = await userModel.get({ id }).catch(() => {
+        throw new Error('Falha ao adiquirir usuario');
+      });
 
       return {
         data: {
-          user: Array.isArray(user) ? {} : user,
+          user,
         },
       };
     } catch (e) {
@@ -51,10 +45,9 @@ function makeUserService({ model }) {
 
   async function insert(info) {
     try {
-      const id = await model.insert(info)
-        .catch(() => {
-          throw customError('772042367', 'Não foi possível adicionar usuário');
-        });
+      const id = await userModel.insert(info).catch(() => {
+        throw new Error('Não foi possível adicionar usuário');
+      });
 
       return {
         data: {
@@ -68,18 +61,14 @@ function makeUserService({ model }) {
 
   async function update(data) {
     try {
-      const {
-        userId: id,
-        name,
-      } = data;
+      const { userId: id, name } = data;
 
-      const user = await model.get({ id })
-        .catch(() => {
-          throw customError('772042367', 'Usuário inexistente');
-        });
+      const user = await userModel.get({ id }).catch(() => {
+        throw new Error('Usuário inexistente');
+      });
 
       if (!user) {
-        throw customError('772042367', 'Usuário inexistente');
+        throw new Error('Usuário inexistente');
       }
 
       const updateData = {
@@ -91,10 +80,9 @@ function makeUserService({ model }) {
         },
       };
 
-      await model.update(updateData)
-        .catch(() => {
-          throw customError('772042367', 'Falha ao atualizar usuário');
-        });
+      await userModel.update(updateData).catch(() => {
+        throw new Error('Falha ao atualizar usuário');
+      });
 
       return;
     } catch (e) {
@@ -104,23 +92,19 @@ function makeUserService({ model }) {
 
   async function _delete(info) {
     try {
-      const {
-        userId: id,
-      } = info;
+      const { userId: id } = info;
 
-      const user = await model.get({ id })
-        .catch(() => {
-          throw customError('772042367', 'Usuário inexistente');
-        });
+      const user = await userModel.get({ id }).catch(() => {
+        throw new Error('Usuário inexistente');
+      });
 
       if (!user) {
-        throw customError('772042367', 'Usuário inexistente');
+        throw new Error('Usuário inexistente');
       }
 
-      await model.remove({ id })
-        .catch(() => {
-          throw customError('772042367', 'Falha ao deletar usuário');
-        });
+      await userModel.remove({ id }).catch(() => {
+        throw new Error('Falha ao deletar usuário');
+      });
 
       return;
     } catch (e) {
@@ -130,4 +114,3 @@ function makeUserService({ model }) {
 }
 
 module.exports = { makeUserService };
-
