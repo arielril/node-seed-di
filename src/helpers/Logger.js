@@ -53,7 +53,7 @@ function makeLogger(logger) {
 
     const message = err && err.message ? err.message : res.__('helpers.logger.throw');
 
-    this.error(...args);
+    error(...args);
     res.status(500)
       .send({
         success: false,
